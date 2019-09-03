@@ -9,13 +9,13 @@ const cors = require('cors');
 const axios = require('axios');
 const client_id = 6391018844743905;
 const secret_key = 'xSW1AuKdVhB85LcO37UcjOYG9ukASwoy';
+const ml_files_path = "src/ml-files";
 app.set('port', process.env.PORT || 5000);
 
 const meliObject = new meli.Meli(client_id, secret_key);
 
-request(`https://auth.mercadolibre.com.ar/authorization?response_type=token&client_id=${client_id}&redirect-uri=http://localhost:5000/oauth2/redirect-uri/`, 
-(error, request, body) => {
-    bodyOutput = body;
+app.get('/', (req, res) => {
+    res.redirect('/ml-services/');
 });
 
 app.get('/ml-services/', function (req,res) {
@@ -25,13 +25,10 @@ app.get('/ml-services/', function (req,res) {
 app.get('/oauth2/callback-uri/', (req, res) => {    
     getToken(req.query.code)
     .then(result => {
-        res.status(200).send({
-            result: result.data
-        });
-        fs.writeFile('src/token.json', JSON.stringify(result.data));
+        fs.writeFile(`${ml_files_path}/token.json`, JSON.stringify(result.data));
+        res.redirect('/items/');
     })
-    .catch(error => console.log(error));
-    
+    .catch(error => console.log(error));    
 });
 
 const getToken = async(authCode) => {
@@ -57,36 +54,47 @@ const getAuthCode = async() => {
 }; 
 
 const getTokenSaved = () => {
-    return fs.readFileSync("src/token.json", "utf-8");
+    return fs.readFileSync(`${ml_files_path}/token.json`, "utf-8");
+};
+
+const getUserObjSaved = () => {
+    return fs.readFileSync(`${ml_files_path}/userData.json`, "utf-8");
+};
+
+const getListItems = async() => {
+    let test = getUserObjSaved();
+    console.info("user object", test);
+    let userObj = JSON.parse(test);
+    let token = JSON.parse(getTokenSaved());
+    return axios.get(`https://api.mercadolibre.com/users/${userObj.id}/items/search?search_type=scan&access_token=${token.access_token}`);
 };
 
 const getUserData = async() => {
     let token = JSON.parse(getTokenSaved());
     console.log("token_access", token.access_token);
-    try {
-        return axios.get(`https://api.mercadolibre.com/users/me?access_token=${token.access_token}`);
-    } catch (error) {
-        console.log(error);
-    }
+    return axios.get(`https://api.mercadolibre.com/users/me?access_token=${token.access_token}`);
 };
 
 app.get('/datos/', (req, res) => {
     getUserData().then((result) => {
                     res.status(200)
-                       .send(result.data);
+                       .send(result.data);                       
+                    fs.writeFileSync(`${ml_files_path}/userData.json`,JSON.stringify(result.data));
                 })
-                 .catch(error => console.log(error));
-    // getAuthCode().then(result => {       
-    //     res.send(JSON.stringify(res))
-    // }).catch((err) => console.log(err));    
-    // getUserData()
-    //     .then(res => {
-    //         result = JSON.stringify(res);
-    //     })
-    //     .catch(err => console.log(err));
-    //     res.status(200).send({
-    //         status: result
-    //     });
+                 .catch(error => {
+                     console.log(error);
+                }).then(() => res.redirect('/'));
+});
+
+app.get('/items/', (req, res) => {
+    getListItems().then((result) => {
+        fs.writeFileSync(`${ml_files_path}/items.json`, JSON.stringify(result.data));
+        res.status(200)
+           .download("src/items.json");           
+    })
+     .catch(error => {
+         console.log(error);
+    });
 });
 
 app.listen(app.get('port'), () => {
