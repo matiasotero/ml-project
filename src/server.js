@@ -12,15 +12,15 @@ const ml_files_path = "src/ml-files";
 app.set('port', process.env.PORT || 5000);
 
 // enviroments variables
-process.env.NODE_ENV = 'development';
-// process.env.NODE_ENV = 'production';
+// process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'production';
 // config variables
 const config = require('./settings/config.js');
 
 // const meliObject = new meli.Meli(global.gConfig.client_Id, global.gConfig.secret_key);
 
 app.get('/', (req, res) => {
-    console.log("redirect-uri", global.gConfig.redirect_uri);
+    console.log("global_config", global.gConfig.redirect_uri);
     res.redirect('/ml-services/');
 });
 
