@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/ml-services/', function (req,res) {
-    res.redirect(`https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${global.gConfig.client_id}&redirect-uri=http://localhost:5000/oauth2/redirect-uri/`);
+    res.redirect(`https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${global.gConfig.client_id}&redirect-uri=${global.gConfig.redirect-uri}`);
 });
 
 app.get('/oauth2/callback-uri/', (req, res) => {    
@@ -44,7 +44,7 @@ const getToken = async(authCode) => {
                                 client_id:'6391018844743905',
                                 client_secret:'xSW1AuKdVhB85LcO37UcjOYG9ukASwoy',
                                 code:authCode,
-                                redirect_uri:'http://localhost:5000/oauth2/callback-uri'
+                                redirect_uri:`${global.gConfig.redirect_uri}`
                                 });            
     } catch (error) {
         console.log(error);
