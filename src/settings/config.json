@@ -2,11 +2,11 @@
     "development": {
         "client_id": 6391018844743905,
         "secret_key": "xSW1AuKdVhB85LcO37UcjOYG9ukASwoy",
-        "redirect-uri": "http://localhost:5000/oauth2/redirect-uri/"
+        "redirect_uri": "http://localhost:5000/oauth2/callback-uri"
     },
     "production": {
         "client_id": 7872468987687246,
         "secret_key": "M9rXiKeoP08ycZulBfpbSfu359jREexd",
-        "redirect-uri": "https://api-rest-ml-services.azurewebsites.net/oauth2/redirect-uri/"
+        "redirect_uri": "https://api-rest-ml-services.azurewebsites.net/oauth2/callback-uri"
     }
 }
