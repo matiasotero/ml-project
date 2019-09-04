@@ -26,7 +26,7 @@ app.get('/oauth2/callback-uri/', (req, res) => {
     getToken(req.query.code)
     .then(result => {
         fs.writeFile(`${ml_files_path}/token.json`, JSON.stringify(result.data));
-        res.redirect('/items/');
+        res.redirect('/datos/');
     })
     .catch(error => console.log(error));    
 });
@@ -76,10 +76,9 @@ const getUserData = async() => {
 };
 
 app.get('/datos/', (req, res) => {
-    getUserData().then((result) => {
-                    res.status(200)
-                       .send(result.data);                       
+    getUserData().then((result) => {                      
                     fs.writeFileSync(`${ml_files_path}/userData.json`,JSON.stringify(result.data));
+                    res.redirect('/items/');
                 })
                  .catch(error => {
                      console.log(error);
