@@ -7,7 +7,7 @@
     "start": "nodemon src/server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Matías Otero",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.0",
@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "file-system": "^2.2.2",
     "http": "0.0.0",
+    "loadsh": "0.0.4",
     "mercadolibre": "0.0.13",
     "mongoose": "^5.6.11",
     "morgan": "^1.9.1",

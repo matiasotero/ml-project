@@ -7,19 +7,25 @@ const fs = require('file-system');
 const util = require('util');
 const cors = require('cors');
 const axios = require('axios');
-const client_id = 6391018844743905;
-const secret_key = 'xSW1AuKdVhB85LcO37UcjOYG9ukASwoy';
+
 const ml_files_path = "src/ml-files";
 app.set('port', process.env.PORT || 5000);
 
-const meliObject = new meli.Meli(client_id, secret_key);
+// enviroments variables
+// process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'production';
+// config variables
+const config = require('./settings/config.js');
+
+// const meliObject = new meli.Meli(global.gConfig.client_Id, global.gConfig.secret_key);
 
 app.get('/', (req, res) => {
+    console.log(global.gConfig);
     res.redirect('/ml-services/');
 });
 
 app.get('/ml-services/', function (req,res) {
-    res.redirect(`https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${client_id}&redirect-uri=http://localhost:5000/oauth2/redirect-uri/`);
+    res.redirect(`https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${global.gConfig.client_id}&redirect-uri=http://localhost:5000/oauth2/redirect-uri/`);
 });
 
 app.get('/oauth2/callback-uri/', (req, res) => {    
@@ -45,14 +51,6 @@ const getToken = async(authCode) => {
     }
 };
 
-const getAuthCode = async() => {
-    try {
-        return await axios.get('http://localhost:5000/init/');        
-    } catch (error) {
-        console.log(error);
-    }
-}; 
-
 const getTokenSaved = () => {
     return fs.readFileSync(`${ml_files_path}/token.json`, "utf-8");
 };
@@ -62,9 +60,7 @@ const getUserObjSaved = () => {
 };
 
 const getListItems = async() => {
-    let test = getUserObjSaved();
-    console.info("user object", test);
-    let userObj = JSON.parse(test);
+    let userObj = JSON.parse(getUserObjSaved());
     let token = JSON.parse(getTokenSaved());
     return axios.get(`https://api.mercadolibre.com/users/${userObj.id}/items/search?search_type=scan&access_token=${token.access_token}`);
 };
@@ -89,7 +85,8 @@ app.get('/items/', (req, res) => {
     getListItems().then((result) => {
         fs.writeFileSync(`${ml_files_path}/items.json`, JSON.stringify(result.data));
         res.status(200)
-           .download("src/items.json");           
+           .send(result.data);
+        //    .download(`${ml_files_path}/items.json`);           
     })
      .catch(error => {
          console.log(error);

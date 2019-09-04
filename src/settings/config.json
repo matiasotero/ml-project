@@ -1,0 +1,10 @@
+{
+    "development": {
+        "client_id": 6391018844743905,
+        "secret_key": "xSW1AuKdVhB85LcO37UcjOYG9ukASwoy"
+    },
+    "production": {
+        "client_id": 7872468987687246,
+        "secret_key": "M9rXiKeoP08ycZulBfpbSfu359jREexd"
+    }
+}
